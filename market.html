@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>文创市集 - 移动端优化版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 基础样式确保在所有移动设备上一致 */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; /* 防止横向滚动 */
+        }
+        
+        body {
+            background-color: #fff;
+            padding: 8px; /* 使用固定像素避免小屏过窄 */
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            height: calc(100vh - 16px); /* 减去上下内边距，确保不超出屏幕 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .box {
+            border: 2px solid #000;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0; /* 防止盒子被压缩变形 */
+        }
+        
+        /* 顶部方框 - 按屏幕高度比例分配 */
+        .top-box {
+            height: 20vh; /* 使用视口高度更适合移动端 */
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .top-box h1 {
+            font-size: clamp(18px, 6vw, 24px); /* 最小18px确保小屏可读 */
+            color: #000;
+            font-weight: 700;
+        }
+        
+        /* 中间容器 - 自适应高度 */
+        .middle-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-grow: 1; /* 占满剩余空间，避免内容溢出 */
+            min-height: 25vh; /* 确保最小高度 */
+        }
+        
+        .middle-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        /* 图片自适应处理 */
+        .left-img, .right-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4%;
+            /* 解决图片加载时布局跳动 */
+            min-height: 0;
+        }
+        
+        /* 右侧点击区域优化 */
+        .right-click-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; /* 去除移动端点击蓝色高亮 */
+        }
+        
+        /* 底部方框 - 固定高度比例 */
+        .bottom-box {
+            height: 30vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6%;
+        }
+        
+        .bottom-box p {
+            font-size: clamp(14px, 4vw, 16px); /* 小屏最小14px */
+            color: #000;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        /* 触摸反馈优化 */
+        .right-click-area:active {
+            background-color: #f5f5f5;
+            transform: scale(0.98);
+            transition: all 0.1s ease; /* 统一过渡效果 */
+        }
+        
+        /* 小屏手机特殊适配 (320px以下) */
+        @media (max-width: 320px) {
+            .box {
+                border-width: 1.5px;
+                border-radius: 10px;
+            }
+            .top-box {
+                height: 18vh;
+            }
+            .bottom-box {
+                height: 28vh;
+            }
+        }
+        
+        /* 大屏手机适配 (6.7英寸以上) */
+        @media (min-width: 420px) and (min-height: 900px) {
+            .top-box {
+                height: 22vh;
+            }
+            .bottom-box {
+                height: 32vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部方框 -->
+        <div class="box top-box">
+            <h1>文创市集</h1>
+        </div>
+        
+        <!-- 中间两个方框 -->
+        <div class="middle-container">
+            <div class="box middle-box">
+                <img src="https://s41.ax1x.com/2025/12/06/pZmywjS.png" 
+                     alt="左侧图片" 
+                     class="left-img"
+                     loading="lazy">
+            </div>
+            <div class="box middle-box">
+                <div class="right-click-area" id="rightBox">
+                    <img src="https://s41.ax1x.com/2025/12/06/pZmydc8.png" 
+                         alt="右侧图片" 
+                         class="right-img"
+                         loading="lazy">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部方框 -->
+        <div class="box bottom-box">
+            <p>传统瑞兽文化 · 创意设计展示</p>
+        </div>
+    </div>
+
+    <script>
+        // 优化移动端点击事件
+        const rightBox = document.getElementById('rightBox');
+        
+        // 防止快速连续点击
+        let isClicking = false;
+        rightBox.addEventListener('click', function() {
+            if (isClicking) return;
+            isClicking = true;
+            console.log('右侧方框被点击');
+            setTimeout(() => isClicking = false, 300); // 300ms内屏蔽重复点击
+        });
+        
+        // 触摸事件优化（解决部分设备触摸延迟）
+        rightBox.addEventListener('touchstart', function(e) {
+            e.preventDefault(); // 阻止默认行为（如长按选中）
+            this.style.backgroundColor = '#f5f5f5';
+            this.style.transform = 'scale(0.98)';
+        });
+        
+        rightBox.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+            this.style.transform = 'scale(1)';
+        });
+        
+        // 解决图片加载完成后布局偏移
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.addEventListener('load', () => {
+                // 强制重绘布局
+                document.body.offsetHeight;
+            });
+        });
+    </script>
+</body>
+</html>
